@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: trident-node-linux
+spec:
+  template:
+    spec:
+      containers:
+        - name: csi-nodeinfo-proxy
+          image: quay.io/utilitywarehouse/csi-nodeinfo-proxy:test
+          imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /plugin
+              name: plugin-dir
+        - name: trident-main
+          env:
+            - name: CSI_ENDPOINT
+              value: unix://plugin/csi-proxy.sock
