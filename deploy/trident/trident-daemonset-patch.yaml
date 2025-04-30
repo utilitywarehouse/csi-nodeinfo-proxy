@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
         - name: csi-nodeinfo-proxy
-          image: quay.io/utilitywarehouse/csi-nodeinfo-proxy:test
+          image: quay.io/utilitywarehouse/csi-nodeinfo-proxy:main
           imagePullPolicy: Always
           securityContext:
             privileged: true
