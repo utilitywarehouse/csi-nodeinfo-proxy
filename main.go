@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"path"
+	"time"
 
 	csi "github.com/container-storage-interface/spec/lib/go/csi"
 	"google.golang.org/grpc"
@@ -36,16 +38,36 @@ func getEnv(key, defaultValue string) string {
 	return value
 }
 
-func main() {
-	flag.Parse()
+func waitForSocketAndDial(socketPath string, timeout time.Duration) (*grpc.ClientConn, error) {
+	deadline := time.Now().Add(timeout)
+	for {
+		if time.Now().After(deadline) {
+			return nil, fmt.Errorf("timeout waiting for %s to be ready", socketPath)
+		}
+		if _, err := os.Stat(socketPath); err == nil {
+			conn, err := net.Dial("unix", socketPath)
+			if err == nil {
+				conn.Close()
+				break
+			}
+		}
 
-	conn, err := grpc.Dial(
-		*flagProxyEndpoint,
+		time.Sleep(500 * time.Millisecond)
+	}
+
+	return grpc.Dial(
+		socketPath,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
 			return net.Dial("unix", addr)
 		}),
 	)
+}
+
+func main() {
+	flag.Parse()
+
+	conn, err := waitForSocketAndDial(*flagProxyEndpoint, 10*time.Second)
 	if err != nil {
 		log.Fatalf("Failed to connect to backend CSI: %v", err)
 	}
