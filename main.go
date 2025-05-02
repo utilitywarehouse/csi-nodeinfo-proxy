@@ -49,10 +49,6 @@ func main() {
 	if err := os.Chmod(socketDir, CSISocketDirPermissions); err != nil {
 		log.Fatalf("Failed to chmod socket dir %s, error: %v", socketDir, err)
 	}
-	// Remove existing socket
-	if err := os.Remove(addr); err != nil && !os.IsNotExist(err) {
-		log.Fatalf("Failed to remove %s, error: %v", addr, err)
-	}
 
 	lis, err := net.Listen("unix", addr)
 	if err != nil {
