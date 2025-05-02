@@ -21,7 +21,7 @@ spec:
                 - -c
                 - "[ -S /plugin/csi.sock ]"
             periodSeconds: 2
-            failureThreshold: 5
+            failureThreshold: 30
             initialDelaySeconds: 5
         - name: trident-main
           env:
