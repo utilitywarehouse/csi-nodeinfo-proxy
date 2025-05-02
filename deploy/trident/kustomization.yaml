@@ -6,4 +6,4 @@ patches:
 images:
   - name: csi-nodeinfo-proxy
     newName: quay.io/utilitywarehouse/csi-nodeinfo-proxy
-    newTag: main
+    newTag: v0.1.0
