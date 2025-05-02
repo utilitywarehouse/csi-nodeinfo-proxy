@@ -2,3 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 patches:
 - path: trident-daemonset-patch.yaml
+
+images:
+  - name: csi-nodeinfo-proxy
+    newName: quay.io/utilitywarehouse/csi-nodeinfo-proxy
+    newTag: main
