@@ -14,6 +14,15 @@ spec:
           volumeMounts:
             - mountPath: /plugin
               name: plugin-dir
+          startupProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - "[ -S /plugin/csi.sock ]"
+            periodSeconds: 2
+            failureThreshold: 5
+            initialDelaySeconds: 5
         - name: trident-main
           env:
             - name: CSI_ENDPOINT
