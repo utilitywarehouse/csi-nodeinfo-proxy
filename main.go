@@ -67,7 +67,7 @@ func waitForSocketAndDial(socketPath string, timeout time.Duration) (*grpc.Clien
 func main() {
 	flag.Parse()
 
-	conn, err := waitForSocketAndDial(*flagProxyEndpoint, 10*time.Second)
+	conn, err := waitForSocketAndDial(*flagProxyEndpoint, 30*time.Second)
 	if err != nil {
 		log.Fatalf("Failed to connect to backend CSI: %v", err)
 	}
