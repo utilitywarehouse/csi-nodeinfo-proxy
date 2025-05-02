@@ -38,6 +38,18 @@ func getEnv(key, defaultValue string) string {
 
 func main() {
 	flag.Parse()
+
+	conn, err := grpc.Dial(
+		*flagProxyEndpoint,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+			return net.Dial("unix", addr)
+		}),
+	)
+	if err != nil {
+		log.Fatalf("Failed to connect to backend CSI: %v", err)
+	}
+	defer conn.Close()
 	// Ensure socket dir exists - This is how NetApp/Trident managing
 	// sockets and permissions, so let's do the same.
 	addr := *flagListenEndpoint
@@ -59,18 +71,6 @@ func main() {
 		log.Fatalf("Failed to listen: %v", err)
 	}
 	defer lis.Close()
-
-	conn, err := grpc.Dial(
-		*flagProxyEndpoint,
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
-			return net.Dial("unix", addr)
-		}),
-	)
-	if err != nil {
-		log.Fatalf("Failed to connect to backend CSI: %v", err)
-	}
-	defer conn.Close()
 
 	grpcServer := grpc.NewServer()
 	identityClient := csi.NewIdentityClient(conn)
